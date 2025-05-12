@@ -27,8 +27,18 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    initializeChart();
-    setupEventListeners();
+    // Chart.js가 로드되었는지 확인
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js가 로드되지 않았습니다.');
+        return;
+    }
+
+    try {
+        initializeChart();
+        setupEventListeners();
+    } catch (error) {
+        console.error('차트 초기화 중 오류 발생:', error);
+    }
 
     // 결과 확인 버튼 클릭 이벤트
     const 계산버튼 = document.getElementById('계산버튼');
@@ -155,53 +165,64 @@ function updatePapsItems(선택된체력요인) {
 
 // 차트 초기화
 function initializeChart() {
-    const ctx = document.getElementById('papsChart').getContext('2d');
-    papsChart = new Chart(ctx, {
-        type: 'radar',
-        data: {
-            labels: factors,
-            datasets: [{
-                label: '체력 평가 결과',
-                data: [0, 0, 0, 0, 0],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
-            }]
-        },
-        options: {
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    max: 5,
-                    min: 1,
-                    ticks: {
-                        stepSize: 1,
-                        callback: function(value) {
-                            return (6 - value) + '등급';
+    const ctx = document.getElementById('papsChart');
+    if (!ctx) {
+        console.error('차트 캔버스를 찾을 수 없습니다.');
+        return;
+    }
+
+    try {
+        papsChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: factors,
+                datasets: [{
+                    label: '체력 평가 결과',
+                    data: [0, 0, 0, 0, 0],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 5,
+                        min: 1,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                return (6 - value) + '등급';
+                            }
                         }
                     }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const factor = context.chart.data.labels[context.dataIndex];
-                            const grade = 6 - context.raw;
-                            const score = currentResults[factor].점수;
-                            return `${grade}등급 (${score}점)`;
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const factor = context.chart.data.labels[context.dataIndex];
+                                const grade = 6 - context.raw;
+                                const score = currentResults[factor].점수;
+                                return `${grade}등급 (${score}점)`;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error('차트 생성 중 오류 발생:', error);
+    }
 }
 
 // 이벤트 리스너 설정
