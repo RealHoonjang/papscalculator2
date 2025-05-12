@@ -19,7 +19,7 @@ let currentResults = {
 };
 
 // 페이지 로드 완료 시 실행
-document.addEventListener('DOMContentLoaded', function() {
+window.onload = function() {
     console.log('페이지 로드됨');
     
     if (typeof PAPS_DATA === 'undefined') {
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeChart();
         setupEventListeners();
     } catch (error) {
-        console.error('차트 초기화 중 오류 발생:', error);
+        console.error('초기화 중 오류 발생:', error);
     }
 
     // 결과 확인 버튼 클릭 이벤트
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         평가종목Select.value = '';
     });
-});
+};
 
 // 평가종목 업데이트 함수
 function updatePapsItems(선택된체력요인) {
